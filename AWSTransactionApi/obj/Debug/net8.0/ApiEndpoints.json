@@ -1,0 +1,32 @@
+[
+  {
+    "ContainingType": "AWSTransactionApi.Controllers.TransactionController",
+    "Method": "activate",
+    "RelativePath": "Transaction/card/activate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AWSTransactionApi.Controllers.TransactionController",
+    "Method": "Get",
+    "RelativePath": "Transaction/hola",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AWSTransactionApi.Controllers.TransactionController",
+    "Method": "Saludo",
+    "RelativePath": "Transaction/saludo",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

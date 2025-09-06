@@ -1,0 +1,33 @@
+# Archivos y carpetas de Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Archivos sensibles
+*.tfvars
+*.tfvars.json
+*.key
+*.pem
+
+# Configuración local
+*.iml
+*.log
+*.swp
+*.bak
+*.tmp
+*.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux/macOS
+.cache/
+

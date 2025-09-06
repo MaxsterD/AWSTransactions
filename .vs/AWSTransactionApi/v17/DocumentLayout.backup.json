@@ -1,0 +1,66 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\controllers\\transactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\controllers\\transactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\terraform\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\terraform\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TransactionController.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Controllers\\TransactionController.cs",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Controllers\\TransactionController.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Controllers\\TransactionController.cs",
+              "RelativeToolTip": "AWSTransactionApi\\Controllers\\TransactionController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-06T18:46:22.899Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "main.tf",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Terraform\\main.tf",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Terraform\\main.tf",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Terraform\\main.tf",
+              "RelativeToolTip": "AWSTransactionApi\\Terraform\\main.tf",
+              "ViewState": "AgIAAFkAAAAAAAAAAADwv3MAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-09-06T18:14:55.518Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

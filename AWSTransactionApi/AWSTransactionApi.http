@@ -1,0 +1,6 @@
+@AWSTransactionApi_HostAddress = http://localhost:5263
+
+GET {{AWSTransactionApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

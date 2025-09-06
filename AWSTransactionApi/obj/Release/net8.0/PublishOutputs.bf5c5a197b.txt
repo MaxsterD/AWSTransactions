@@ -1,0 +1,11 @@
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSTransactionApi.exe
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\appsettings.Development.json
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\appsettings.json
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSTransactionApi.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSTransactionApi.deps.json
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSTransactionApi.runtimeconfig.json
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSTransactionApi.pdb
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Microsoft.OpenApi.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Swashbuckle.AspNetCore.SwaggerUI.dll
