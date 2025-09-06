@@ -240,3 +240,60 @@ resource "aws_dynamodb_table" "cards_error" {
     Owner       = "Sebastian"
   }
 }
+
+# ==========================
+# S3 Bucket
+# ==========================
+resource "aws_s3_bucket" "transaction_bucket" {
+  bucket = "bucket-${var.bucket_name}"
+
+  tags = {
+    Service     = "TransactionApi"
+    Environment = var.bucket_name
+    Team        = "Backend"
+    Owner       = "Sebastian"
+  }
+}
+
+resource "aws_iam_policy" "transaction_bucket_policy" {
+  name   = "TransactionBucketPolicy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect : "Allow"
+        Action : [
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource : "${aws_s3_bucket.transaction_bucket.arn}/*"
+      }
+    ]
+  })
+}
+
+# ==========================
+# Dead Letter Queue (DLQ)
+# ==========================
+resource "aws_sqs_queue" "transaction_dlq" {
+  name = var.dlq_name
+
+  message_retention_seconds = 3600
+}
+
+# ==========================
+# SQS Queue
+# ==========================
+resource "aws_sqs_queue" "transaction_queue" {
+  name                        = var.sqs_name
+  fifo_queue                  = false
+  visibility_timeout_seconds  = 900
+  content_based_deduplication = false
+  receive_wait_time_seconds   = 10
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.transaction_dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+

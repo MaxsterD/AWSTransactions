@@ -21,3 +21,21 @@ variable "aws_secret_key" {
   type        = string
   default     = ""
 }
+
+variable "bucket_name" {
+  description = "name of bucket"
+  type        = string
+  default     = "cardse3013575"
+}
+
+variable "sqs_name" {
+  description = "name of sqs"
+  type        = string
+  default     = "transaction-queue"
+}
+
+variable "dlq_name" {
+  description = "name of dlq"
+  type        = string
+  default     = "transaction-dead-letter-queue"
+}
