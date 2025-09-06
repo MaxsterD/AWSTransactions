@@ -7,11 +7,6 @@ terraform {
     }
   }
 }
-
-provider "aws" {
-  region = var.aws_region
-}
-
 # -------------------
 # IAM Role para Lambda
 # -------------------
@@ -19,7 +14,6 @@ resource "aws_iam_role" "iam_for_lambda" {
   name = "ExecutionLambda"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
     Statement = [
       {
         Action = "sts:AssumeRole"
@@ -41,14 +35,14 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 # Lambda Function
 # -------------------
 resource "aws_lambda_function" "dotnet_api" {
-  function_name    = var.lambda_name
-  filename         = "${path.module}/../../publish/app.zip"
-  handler          = "AWSTransactionApi::AWSTransactionApi.LambdaEntryPoint::FunctionHandlerAsync"
-  runtime          = "dotnet8"
-  role             = aws_iam_role.iam_for_lambda.arn
-  memory_size      = 512
-  timeout          = 900
-  publish          = true
+  function_name = var.lambda_name
+  filename      = "${path.module}/../../publish/app.zip"
+  handler       = "AWSTransactionApi::AWSTransactionApi.LambdaEntryPoint::FunctionHandlerAsync"
+  runtime       = "dotnet8"
+  role          = aws_iam_role.iam_for_lambda.arn
+  memory_size   = 512
+  timeout       = 900
+  publish       = true
 
   source_code_hash = filebase64sha256("${path.module}/../../publish/app.zip")
 
@@ -111,7 +105,7 @@ resource "aws_api_gateway_method" "PostCardActivate" {
 # ==========================
 resource "aws_api_gateway_integration" "IntegrationPostCardActivate" {
   rest_api_id             = aws_api_gateway_rest_api.CardApi.id
-  resource_id             = aws_api_gateway_resource.CardActivate.id   
+  resource_id             = aws_api_gateway_resource.CardActivate.id
   http_method             = aws_api_gateway_method.PostCardActivate.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
@@ -157,45 +151,62 @@ output "api_url_card_activate" {
   value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/card/activate"
 }
 
-// Crear la configuracion de la lambda
-# resource "aws_lambda_function" "CreateUserLmb" {
-#   // Configuraciones
-#   filename         = "${path.module}/../publish/app.zip"
-#   function_name    = var.lambda_name
-#   handler          = "AWSTransactionApi::AWSTransactionApi.LambdaEntryPoint::FunctionHandlerAsync"
-#   runtime          = "dotnet8"
-#   timeout          = 900
-#   memory_size      = 256
-#   role             = aws_iam_role.iam_for_lambda.arn
-#   source_code_hash = filebase64sha256("${path.module}/../publish/app.zip")
+# ==========================
+# DynamoDB Cards Table
+# ==========================
+resource "aws_dynamodb_table" "cards" {
+  name           = "cards"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 20
+  write_capacity = 20
 
-#   environment {
-#     variables = {
-#       userTable : aws_dynamodb_table.UserTable.arn,
-#       onboardingSqs : aws_sqs_queue.Onboarding_sqs_queue.url,
-#       fileBucket : aws_s3_bucket.FileBucket.bucket,
-#       secretName : aws_secretsmanager_secret.MySecret.name
-#     }
-#   }
+  hash_key  = "uuid"
+  range_key = "createdAt"
 
-#   depends_on = [
-#     aws_iam_role_policy_attachment.lambda_basic_execution,
-#     data.archive_file.lambda_user_create_file
-#   ]
-# }
+  attribute {
+    name = "uuid"
+    type = "S"
+  }
 
-# resource "aws_iam_role_policy" "iam_policy_for_lambda" {
-#   name   = "lambdaCreateUser"
-#   policy = data.aws_iam_policy_document.lambda_execution.json
-#   role   = aws_iam_role.iam_for_lambda.id
-# }
+  attribute {
+    name = "createdAt"
+    type = "S"
+  }
 
-# resource "aws_iam_role" "iam_for_lambda" {
-#   name               = "ExecutionLambda"
-#   assume_role_policy = data.aws_iam_policy_document.assume_role.json
-# }
+  tags = {
+    Service     = "TransactionApi"
+    Environment = "prod"
+    Team        = "Backend"
+    Owner       = "Sebastian"
+  }
+}
 
-# resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-#   role       = aws_iam_role.iam_for_lambda.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-# }
+# ==========================
+# DynamoDB Transactions Table
+# ==========================
+resource "aws_dynamodb_table" "transactions" {
+  name           = "transactions"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 20
+  write_capacity = 20
+
+  hash_key  = "uuid"
+  range_key = "createdAt"
+
+  attribute {
+    name = "uuid"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdAt"
+    type = "S"
+  }
+
+  tags = {
+    Service     = "TransactionApi"
+    Environment = "prod"
+    Team        = "Backend"
+    Owner       = "Sebastian"
+  }
+}
