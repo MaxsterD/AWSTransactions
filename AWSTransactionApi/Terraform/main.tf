@@ -210,3 +210,33 @@ resource "aws_dynamodb_table" "transactions" {
     Owner       = "Sebastian"
   }
 }
+
+# ==========================
+# DynamoDB Cards-Error Table
+# ==========================
+resource "aws_dynamodb_table" "cards_error" {
+  name           = "cards_error"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 20
+  write_capacity = 20
+
+  hash_key  = "uuid"
+  range_key = "createdAt"
+
+  attribute {
+    name = "uuid"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdAt"
+    type = "S"
+  }
+
+  tags = {
+    Service     = "TransactionApi"
+    Environment = "prod"
+    Team        = "Backend"
+    Owner       = "Sebastian"
+  }
+}
