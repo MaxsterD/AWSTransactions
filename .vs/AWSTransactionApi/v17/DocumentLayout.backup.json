@@ -3,12 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\controllers\\transactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\controllers\\transactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\services\\card\\cardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\services\\card\\cardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\models\\dynamomodels\\carddynamo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\models\\dynamomodels\\carddynamo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\models\\transaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\models\\transaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\terraform\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\terraform\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\controllers\\cardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\controllers\\cardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|c:\\users\\usuario\\source\\repos\\awstransactionapi\\awstransactionapi\\models\\card.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B336453E-3E6C-4E2C-A000-D22996CBC0D9}|AWSTransactionApi\\AWSTransactionApi.csproj|solutionrelative:awstransactionapi\\models\\card.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,32 +34,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "TransactionController.cs",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Controllers\\TransactionController.cs",
-              "RelativeDocumentMoniker": "AWSTransactionApi\\Controllers\\TransactionController.cs",
-              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Controllers\\TransactionController.cs",
-              "RelativeToolTip": "AWSTransactionApi\\Controllers\\TransactionController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAJAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "CardDynamo.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Models\\DynamoModels\\CardDynamo.cs",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Models\\DynamoModels\\CardDynamo.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Models\\DynamoModels\\CardDynamo.cs",
+              "RelativeToolTip": "AWSTransactionApi\\Models\\DynamoModels\\CardDynamo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAMAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-06T18:46:22.899Z",
+              "WhenOpened": "2025-09-07T12:54:54.414Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "main.tf",
-              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Terraform\\main.tf",
-              "RelativeDocumentMoniker": "AWSTransactionApi\\Terraform\\main.tf",
-              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Terraform\\main.tf",
-              "RelativeToolTip": "AWSTransactionApi\\Terraform\\main.tf",
-              "ViewState": "AgIAAFkAAAAAAAAAAADwv3MAAAA8AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-09-06T18:14:55.518Z",
+              "DocumentIndex": 0,
+              "Title": "CardService.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Services\\Card\\CardService.cs",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Services\\Card\\CardService.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Services\\Card\\CardService.cs",
+              "RelativeToolTip": "AWSTransactionApi\\Services\\Card\\CardService.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAmwC8AAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T12:35:59.06Z",
               "EditorCaption": ""
             },
             {
@@ -57,6 +73,58 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Transaction.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Models\\Transaction.cs",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Models\\Transaction.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Models\\Transaction.cs",
+              "RelativeToolTip": "AWSTransactionApi\\Models\\Transaction.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T12:37:23.809Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Card.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Models\\Card.cs",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Models\\Card.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Models\\Card.cs",
+              "RelativeToolTip": "AWSTransactionApi\\Models\\Card.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T12:36:26.322Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CardController.cs",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Controllers\\CardController.cs",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Controllers\\CardController.cs",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Controllers\\CardController.cs",
+              "RelativeToolTip": "AWSTransactionApi\\Controllers\\CardController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T12:35:26.96Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "main.tf",
+              "DocumentMoniker": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Terraform\\main.tf",
+              "RelativeDocumentMoniker": "AWSTransactionApi\\Terraform\\main.tf",
+              "ToolTip": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\Terraform\\main.tf",
+              "RelativeToolTip": "AWSTransactionApi\\Terraform\\main.tf",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAAALsAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-09-06T18:14:55.518Z",
+              "EditorCaption": ""
             }
           ]
         }

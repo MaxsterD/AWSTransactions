@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "KqOvpNG4cvw=",
+  "dgSpecHash": "txc86no0QUo=",
   "success": true,
   "projectFilePath": "C:\\Users\\USUARIO\\source\\repos\\AWSTransactionApi\\AWSTransactionApi\\AWSTransactionApi.csproj",
   "expectedPackageFiles": [
@@ -11,6 +11,8 @@
     "C:\\Users\\USUARIO\\.nuget\\packages\\amazon.lambda.logging.aspnetcore\\4.1.0\\amazon.lambda.logging.aspnetcore.4.1.0.nupkg.sha512",
     "C:\\Users\\USUARIO\\.nuget\\packages\\amazon.lambda.runtimesupport\\1.13.2\\amazon.lambda.runtimesupport.1.13.2.nupkg.sha512",
     "C:\\Users\\USUARIO\\.nuget\\packages\\amazon.lambda.serialization.systemtextjson\\2.4.4\\amazon.lambda.serialization.systemtextjson.2.4.4.nupkg.sha512",
+    "C:\\Users\\USUARIO\\.nuget\\packages\\awssdk.core\\4.0.0.26\\awssdk.core.4.0.0.26.nupkg.sha512",
+    "C:\\Users\\USUARIO\\.nuget\\packages\\awssdk.dynamodbv2\\4.0.6.1\\awssdk.dynamodbv2.4.0.6.1.nupkg.sha512",
     "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.configuration\\2.1.0\\microsoft.extensions.configuration.2.1.0.nupkg.sha512",
     "C:\\Users\\USUARIO\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\2.1.0\\microsoft.extensions.configuration.abstractions.2.1.0.nupkg.sha512",

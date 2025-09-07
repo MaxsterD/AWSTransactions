@@ -1,9 +1,21 @@
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using AWSTransactionApi.Interfaces.Card;
 using AWSTransactionApi.Services.Card;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<IAmazonDynamoDB>(sp =>
+{
+    return new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast2);
+});
+
+builder.Services.AddSingleton<IDynamoDBContext>(sp =>
+{
+    var client = sp.GetRequiredService<IAmazonDynamoDB>();
+    return new DynamoDBContext(client);
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
