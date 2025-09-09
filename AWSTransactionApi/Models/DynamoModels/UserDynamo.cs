@@ -9,5 +9,7 @@ namespace AWSTransactionApi.Models.DynamoModels
         [DynamoDBHashKey] // Primary Key
         public string uuid { get; set; }
 
+        [DynamoDBRangeKey]
+        public string document { get; set; }
     }
 }
