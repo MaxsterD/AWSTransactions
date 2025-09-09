@@ -355,6 +355,7 @@ output "api_url_card_report" {
 # ==========================
 # DynamoDB Cards Table
 # ==========================
+
 resource "aws_dynamodb_table" "cards" {
   name           = "cards"
   billing_mode   = "PROVISIONED"
@@ -416,7 +417,7 @@ resource "aws_dynamodb_table" "transactions" {
 # DynamoDB Cards-Error Table
 # ==========================
 resource "aws_dynamodb_table" "cards_error" {
-  name           = "cards_error"
+  name           = "card-table-error"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
@@ -440,6 +441,41 @@ resource "aws_dynamodb_table" "cards_error" {
     Team        = "Backend"
     Owner       = "Sebastian"
   }
+}
+
+# ==========================
+# DynamoDB Policy
+# ==========================
+
+resource "aws_iam_policy" "dynamodb_policy" {
+  name = "TransactionApiDynamoDBPolicy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:DescribeTable"
+        ]
+        Resource = [
+          aws_dynamodb_table.cards.arn,
+          aws_dynamodb_table.transactions.arn,
+          aws_dynamodb_table.cards_error.arn
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.dynamodb_policy.arn
 }
 
 # ==========================

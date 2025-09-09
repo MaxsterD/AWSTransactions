@@ -7,6 +7,9 @@ public class CardErrorDynamo
     public string uuid { get; set; } = Guid.NewGuid().ToString();
 
     [DynamoDBProperty]
+    public string cardId { get; set; }
+
+    [DynamoDBProperty]
     public string rawMessage { get; set; }
 
     [DynamoDBProperty]

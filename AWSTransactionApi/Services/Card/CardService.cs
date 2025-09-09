@@ -4,6 +4,7 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using AWSTransactionApi.Interfaces.Card;
 using AWSTransactionApi.Models;
+using AWSTransactionApi.Models.DynamoModels;
 using System.Globalization;
 using System.Text;
 using System.Transactions;
@@ -25,19 +26,48 @@ namespace AWSTransactionApi.Services.Card
             _reportsBucket = cfg["ReportsBucket"] ?? throw new ArgumentNullException("ReportsBucket");
         }
 
+        private async Task LogErrorAsync(string cardId, Exception ex, string rawMessage = null)
+        {
+            var error = new CardErrorDynamo
+            {
+                cardId = cardId,
+                errorMessage = ex.Message,
+                rawMessage = rawMessage,
+                createdAt = DateTime.UtcNow
+            };
+            await _dbContext.SaveAsync(error);
+        }
+
         public async Task<CardDynamo> CreateCardAsync(string userId, string requestType)
         {
+            var userScan = await _dbContext.ScanAsync<UserDynamo>(
+                new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, userId) }
+            ).GetRemainingAsync();
 
-            // Validar request
+            if (!userScan.Any())
+                throw new Exception($"User {userId} does not exist in users table");
+
             if (requestType != CardType.DEBIT.ToString() && requestType != CardType.CREDIT.ToString())
                 throw new ArgumentException("Request type must be DEBIT or CREDIT");
 
-            // Verificar si ya existe una tarjeta de ese tipo para el usuario
-            var existingCards = await _dbContext.QueryAsync<CardDynamo>(userId).GetRemainingAsync();
-            if (existingCards.Any(c => c.type == requestType))
-                throw new Exception($"User already has a {requestType} card");
+            var conditions = new List<ScanCondition>
+            {
+                new ScanCondition("userId", ScanOperator.Equal, userId),
+                new ScanCondition("type", ScanOperator.Equal, requestType)
+            };
 
-            // Crear tarjeta
+            var existingCards = await _dbContext
+                .ScanAsync<CardDynamo>(conditions)
+                .GetRemainingAsync();
+
+            if (existingCards.Any())
+            {
+                var existingCardId = existingCards.First().uuid; 
+                await LogErrorAsync(existingCardId, new Exception($"User already has a {requestType} card"),
+                                   $"CreateCardAsync: requestType={requestType}");
+                throw new Exception($"User already has a {requestType} card");
+            }
+
             var card = new CardDynamo
             {
                 uuid = Guid.NewGuid().ToString(),
@@ -89,123 +119,171 @@ namespace AWSTransactionApi.Services.Card
 
         public async Task<TransactionDynamo> PurchaseAsync(string cardId, string merchant, decimal amount)
         {
-            var card = await _dbContext.LoadAsync<CardDynamo>(cardId);
-            if (card == null) throw new Exception("Card not found");
-            if (card.type == "DEBIT")
+            try
             {
-                if (card.balance < amount) throw new Exception("Insufficient balance");
-                card.balance -= amount;
+                var cards = await _dbContext.ScanAsync<CardDynamo>(
+                new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, cardId) }
+                ).GetRemainingAsync();
+
+                var card = cards.FirstOrDefault();
+                if (card == null) throw new Exception("Card not found");
+                if (card.type == "DEBIT")
+                {
+                    if (card.balance < amount) throw new Exception("Insufficient balance");
+                    card.balance -= amount;
+                }
+                else // CREDIT
+                {
+                    // For credit we assume 'balance' stores used balance. Need a limit — let's assume 5000 for now
+                    decimal limit = 5000m;
+                    if ((card.balance + amount) > limit) throw new Exception("Credit limit exceeded");
+                    card.balance += amount; // increase debt/used
+                }
+
+                await _dbContext.SaveAsync(card);
+
+                var tx = new TransactionDynamo
+                {
+                    uuid = Guid.NewGuid().ToString(),
+                    cardId = card.uuid,
+                    amount = amount,
+                    merchant = merchant,
+                    type = "PURCHASE",
+                    createdAt = DateTime.UtcNow
+                };
+
+                await _dbContext.SaveAsync(tx);
+                return tx;
             }
-            else // CREDIT
+            catch (Exception ex)
             {
-                // For credit we assume 'balance' stores used balance. Need a limit — let's assume 5000 for now
-                decimal limit = 5000m;
-                if ((card.balance + amount) > limit) throw new Exception("Credit limit exceeded");
-                card.balance += amount; // increase debt/used
+                await LogErrorAsync(cardId, ex, $"PurchaseAsync: merchant={merchant}, amount={amount}");
+                throw;
             }
-
-            await _dbContext.SaveAsync(card);
-
-            var tx = new TransactionDynamo
-            {
-                uuid = Guid.NewGuid().ToString(),
-                cardId = card.uuid,
-                amount = amount,
-                merchant = merchant,
-                type = "PURCHASE",
-                createdAt = DateTime.UtcNow
-            };
-
-            await _dbContext.SaveAsync(tx);
-            return tx;
+            
         }
 
         public async Task<TransactionDynamo> SaveTransactionAsync(string cardId, string merchant, decimal amount)
         {
-            var card = await _dbContext.LoadAsync<CardDynamo>(cardId);
-            if (card == null) throw new Exception("Card not found");
-            if (card.type != "DEBIT") throw new Exception("Only debit cards can save balance");
-
-            card.balance += amount;
-            await _dbContext.SaveAsync(card);
-
-            var tx = new TransactionDynamo
+            try
             {
-                uuid = Guid.NewGuid().ToString(),
-                cardId = card.uuid,
-                amount = amount,
-                merchant = merchant,
-                type = "SAVING",
-                createdAt = DateTime.UtcNow
-            };
+                var cards = await _dbContext.ScanAsync<CardDynamo>(
+                new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, cardId) }
+                ).GetRemainingAsync();
 
-            await _dbContext.SaveAsync(tx);
-            return tx;
+                var card = cards.FirstOrDefault();
+                if (card == null) throw new Exception("Card not found");
+                if (card.type != "DEBIT") throw new Exception("Only debit cards can save balance");
+
+                card.balance += amount;
+                await _dbContext.SaveAsync(card);
+
+                var tx = new TransactionDynamo
+                {
+                    uuid = Guid.NewGuid().ToString(),
+                    cardId = card.uuid,
+                    amount = amount,
+                    merchant = merchant,
+                    type = "SAVING",
+                    createdAt = DateTime.UtcNow
+                };
+
+                await _dbContext.SaveAsync(tx);
+                return tx;
+            }
+            catch (Exception ex)
+            {
+                await LogErrorAsync(cardId, ex, $"SaveTransactionAsync: merchant={merchant}, amount={amount}");
+                throw;
+            }
+            
         }
 
         public async Task<TransactionDynamo> PayCreditCardAsync(string cardId, string merchant, decimal amount)
         {
-            var card = await _dbContext.LoadAsync<CardDynamo>(cardId);
-            if (card == null) throw new Exception("Card not found");
-            if (card.type != "CREDIT") throw new Exception("Only credit cards can be paid");
-
-            // Decrease the used balance
-            card.balance -= amount;
-            if (card.balance < 0) card.balance = 0;
-            await _dbContext.SaveAsync(card);
-
-            var tx = new TransactionDynamo
+            try
             {
-                uuid = Guid.NewGuid().ToString(),
-                cardId = card.uuid,
-                amount = amount,
-                merchant = merchant,
-                type = "PAYMENT_BALANCE",
-                createdAt = DateTime.UtcNow
-            };
+                var cards = await _dbContext.ScanAsync<CardDynamo>(
+                new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, cardId) }
+                ).GetRemainingAsync();
 
-            await _dbContext.SaveAsync(tx);
-            return tx;
+                var card = cards.FirstOrDefault();
+                if (card == null) throw new Exception("Card not found");
+                if (card.type != "CREDIT") throw new Exception("Only credit cards can be paid");
+
+                // Decrease the used balance
+                card.balance -= amount;
+                if (card.balance < 0) card.balance = 0;
+                await _dbContext.SaveAsync(card);
+
+                var tx = new TransactionDynamo
+                {
+                    uuid = Guid.NewGuid().ToString(),
+                    cardId = card.uuid,
+                    amount = amount,
+                    merchant = merchant,
+                    type = "PAYMENT_BALANCE",
+                    createdAt = DateTime.UtcNow
+                };
+
+                await _dbContext.SaveAsync(tx);
+                return tx;
+            }
+            catch (Exception ex)
+            {
+                await LogErrorAsync(cardId, ex, $"PayCreditCardAsync: merchant={merchant}, amount={amount}");
+                throw;
+            }
+            
         }
 
         public async Task<(string s3Key, string bucket)> GenerateReportAsync(string cardId, string startIso, string endIso)
         {
-            // parse dates
-            var start = DateTime.Parse(startIso, null, DateTimeStyles.RoundtripKind);
-            var end = DateTime.Parse(endIso, null, DateTimeStyles.RoundtripKind);
-
-            // get transactions for cardId in range
-            var txs = await _dbContext.ScanAsync<TransactionDynamo>(new List<ScanCondition> { new ScanCondition("cardId", ScanOperator.Equal, cardId) })
-                        .GetRemainingAsync();
-            var filtered = txs.Where(t =>
+            try
             {
-                var created = t.createdAt;
-                return created >= start && created <= end;
-            }).OrderBy(t => t.createdAt).ToList();
+                // parse dates
+                var start = DateTime.Parse(startIso, null, DateTimeStyles.RoundtripKind);
+                var end = DateTime.Parse(endIso, null, DateTimeStyles.RoundtripKind);
 
-            // build CSV
-            var sb = new StringBuilder();
-            sb.AppendLine("uuid,cardId,amount,merchant,type,createdAt");
-            foreach (var t in filtered)
-            {
-                sb.AppendLine($"\"{t.uuid}\",\"{t.cardId}\",\"{t.amount}\",\"{t.merchant}\",\"{t.type}\",\"{t.createdAt}\"");
-            }
-
-            var key = $"reports/{cardId}/{Guid.NewGuid()}.csv";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString())))
-            {
-                var uploadRequest = new Amazon.S3.Transfer.TransferUtilityUploadRequest
+                // get transactions for cardId in range
+                var txs = await _dbContext.ScanAsync<TransactionDynamo>(new List<ScanCondition> { new ScanCondition("cardId", ScanOperator.Equal, cardId) })
+                            .GetRemainingAsync();
+                var filtered = txs.Where(t =>
                 {
-                    InputStream = ms,
-                    Key = key,
-                    BucketName = _reportsBucket,
-                    ContentType = "text/csv"
-                };
-                var tu = new TransferUtility(_s3);
-                await tu.UploadAsync(uploadRequest);
-            }
+                    var created = t.createdAt;
+                    return created >= start && created <= end;
+                }).OrderBy(t => t.createdAt).ToList();
 
-            return (key, _reportsBucket);
+                // build CSV
+                var sb = new StringBuilder();
+                sb.AppendLine("uuid,cardId,amount,merchant,type,createdAt");
+                foreach (var t in filtered)
+                {
+                    sb.AppendLine($"\"{t.uuid}\",\"{t.cardId}\",\"{t.amount}\",\"{t.merchant}\",\"{t.type}\",\"{t.createdAt}\"");
+                }
+
+                var key = $"reports/{cardId}/{Guid.NewGuid()}.csv";
+                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString())))
+                {
+                    var uploadRequest = new Amazon.S3.Transfer.TransferUtilityUploadRequest
+                    {
+                        InputStream = ms,
+                        Key = key,
+                        BucketName = _reportsBucket,
+                        ContentType = "text/csv"
+                    };
+                    var tu = new TransferUtility(_s3);
+                    await tu.UploadAsync(uploadRequest);
+                }
+
+                return (key, _reportsBucket);
+            }
+            catch (Exception ex)
+            {
+                await LogErrorAsync(cardId, ex, $"GenerateReportAsync: start={startIso}, end={endIso}");
+                throw;
+            }
+            
         }
 
       

@@ -1,4 +1,7 @@
-﻿using Amazon.Lambda.AspNetCoreServer;
+﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.Lambda.AspNetCoreServer;
+using Amazon.S3;
 using Microsoft.AspNetCore.Hosting;
 
 namespace AWSTransactionApi
@@ -20,6 +23,21 @@ namespace AWSTransactionApi
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+            services.AddSingleton<IAmazonDynamoDB>(sp =>
+            {
+                return new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast2);
+            });
+
+            services.AddSingleton<IDynamoDBContext>(sp =>
+            {
+                var client = sp.GetRequiredService<IAmazonDynamoDB>();
+                return new DynamoDBContext(client);
+            });
+
+            services.AddSingleton<IAmazonS3>(sp =>
+            {
+                return new AmazonS3Client(Amazon.RegionEndpoint.USEast2);
+            });
             services.AddScoped<Interfaces.Card.ICardService, Services.Card.CardService>();
         }
 

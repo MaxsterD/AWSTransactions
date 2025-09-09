@@ -1,32 +1,118 @@
 [
   {
-    "ContainingType": "AWSTransactionApi.Controllers.TransactionController",
-    "Method": "activate",
+    "ContainingType": "CardController",
+    "Method": "GetReport",
+    "RelativePath": "Transaction/card/{cardId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cardId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "start",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "end",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CardController",
+    "Method": "Activate",
     "RelativePath": "Transaction/card/activate",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "AWSTransactionApi.Models.ActivateCardRequest",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "AWSTransactionApi.Controllers.TransactionController",
-    "Method": "Get",
-    "RelativePath": "Transaction/hola",
-    "HttpMethod": "GET",
+    "ContainingType": "CardController",
+    "Method": "Create",
+    "RelativePath": "Transaction/card/create",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "AWSTransactionApi.Models.CreateCardMessage",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "AWSTransactionApi.Controllers.TransactionController",
-    "Method": "Saludo",
-    "RelativePath": "Transaction/saludo",
-    "HttpMethod": "GET",
+    "ContainingType": "CardController",
+    "Method": "Pay",
+    "RelativePath": "Transaction/card/paid/{cardId}",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "cardId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "req",
+        "Type": "AWSTransactionApi.Models.PayCreditRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CardController",
+    "Method": "Purchase",
+    "RelativePath": "Transaction/transactions/purchase",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "AWSTransactionApi.Models.PurchaseRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CardController",
+    "Method": "Save",
+    "RelativePath": "Transaction/transactions/save/{cardId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cardId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "req",
+        "Type": "AWSTransactionApi.Models.SaveBalanceRequest",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   }
 ]

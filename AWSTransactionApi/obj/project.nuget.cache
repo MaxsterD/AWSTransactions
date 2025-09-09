@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "n8gEdrtJowY=",
+  "dgSpecHash": "A30b6+h7W7E=",
   "success": true,
   "projectFilePath": "C:\\Users\\Usuario\\source\\repos\\AWSTransactions\\AWSTransactionApi\\AWSTransactionApi.csproj",
   "expectedPackageFiles": [
@@ -31,7 +31,8 @@
     "C:\\Users\\Usuario\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.6.2\\swashbuckle.aspnetcore.swaggergen.6.6.2.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.6.2\\swashbuckle.aspnetcore.swaggerui.6.6.2.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\system.memory\\4.5.0\\system.memory.4.5.0.nupkg.sha512",
-    "C:\\Users\\Usuario\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.0\\system.runtime.compilerservices.unsafe.4.5.0.nupkg.sha512"
+    "C:\\Users\\Usuario\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.0\\system.runtime.compilerservices.unsafe.4.5.0.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.netcore.app.host.linux-x64\\8.0.19\\microsoft.netcore.app.host.linux-x64.8.0.19.nupkg.sha512"
   ],
   "logs": []
 }

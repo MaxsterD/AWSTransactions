@@ -31,3 +31,48 @@ Desktop.ini
 # Linux/macOS
 .cache/
 
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build Folders
+bin/
+obj/
+out/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# ASP.NET
+appsettings.*.json
+launchSettings.json
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Visual Studio Code
+.vscode/
+
+# OS Files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Swagger/NSwag (opcional, si generas código)
+nswag.json
+swagger.json
+swagger.yaml
+

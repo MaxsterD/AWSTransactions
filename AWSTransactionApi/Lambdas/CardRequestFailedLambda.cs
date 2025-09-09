@@ -36,7 +36,7 @@ namespace AWSTransactionApi.Lambdas
                 catch (Exception ex)
                 {
                     context.Logger.LogError($"[DLQ] Failed to save error message: {ex.Message}");
-                    throw; // Dejas que la Lambda vuelva a fallar para no perder el mensaje
+                    throw; 
                 }
             }
         }
