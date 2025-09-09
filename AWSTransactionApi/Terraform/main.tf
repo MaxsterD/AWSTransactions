@@ -7,13 +7,15 @@ terraform {
     }
   }
 }
+
 # -------------------
-# IAM Role para Lambda
+# IAM Role para Lambdas
 # -------------------
 resource "aws_iam_role" "iam_for_lambda" {
   name = "ExecutionLambda"
 
   assume_role_policy = jsonencode({
+    Version = "2012-10-17",
     Statement = [
       {
         Action = "sts:AssumeRole"
@@ -32,10 +34,23 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 }
 
 # -------------------
-# Lambda Function
+# Lambda Functions
 # -------------------
-resource "aws_lambda_function" "dotnet_api" {
-  function_name = var.lambda_name
+locals {
+  lambda_config = {
+    create_request_card   = "create-request-card-lambda"
+    card_activate         = "card-activate-lambda"
+    card_purchase         = "card-purchase-lambda"
+    card_transaction_save = "card-transaction-save-lambda"
+    card_paid_credit_card = "card-paid-credit-card-lambda"
+    card_get_report       = "card-get-report-lambda"
+    card_request_failed   = "card-request-failed"
+  }
+}
+
+resource "aws_lambda_function" "lambdas" {
+  for_each      = local.lambda_config
+  function_name = each.value
   filename      = "${path.module}/../../publish/app.zip"
   handler       = "AWSTransactionApi::AWSTransactionApi.LambdaEntryPoint::FunctionHandlerAsync"
   runtime       = "dotnet8"
@@ -43,16 +58,7 @@ resource "aws_lambda_function" "dotnet_api" {
   memory_size   = 512
   timeout       = 900
   publish       = true
-
   source_code_hash = filebase64sha256("${path.module}/../../publish/app.zip")
-
-  environment {
-    variables = {
-      ASPNETCORE_ENVIRONMENT = "Production"
-    }
-  }
-
-  depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
 }
 
 # ==========================
@@ -73,7 +79,7 @@ resource "aws_api_gateway_resource" "TransactionResource" {
 }
 
 # ==========================
-# Resource /Transaction/card
+# /Transaction/card (base path)
 # ==========================
 resource "aws_api_gateway_resource" "CardResource" {
   rest_api_id = aws_api_gateway_rest_api.CardApi.id
@@ -82,17 +88,56 @@ resource "aws_api_gateway_resource" "CardResource" {
 }
 
 # ==========================
-# Resource /Transaction/card/activate
+# /Transaction/transactions (base path para transacciones)
 # ==========================
+resource "aws_api_gateway_resource" "TransactionsResource" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.TransactionResource.id
+  path_part   = "transactions"
+}
+
+# -------------------
+# Endpoints -> Lambdas
+# -------------------
+
+# 1) POST /Transaction/card/create -> create_request_card
+resource "aws_api_gateway_resource" "CardCreate" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.CardResource.id
+  path_part   = "create"
+}
+
+resource "aws_api_gateway_method" "PostCardCreate" {
+  rest_api_id   = aws_api_gateway_rest_api.CardApi.id
+  resource_id   = aws_api_gateway_resource.CardCreate.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "IntegrationPostCardCreate" {
+  rest_api_id             = aws_api_gateway_rest_api.CardApi.id
+  resource_id             = aws_api_gateway_resource.CardCreate.id
+  http_method             = aws_api_gateway_method.PostCardCreate.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambdas["create_request_card"].invoke_arn
+}
+
+resource "aws_lambda_permission" "ApiGatewayCardCreate" {
+  statement_id  = "AllowExecutionFromAPIGatewayCardCreate"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambdas["create_request_card"].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.CardApi.execution_arn}/*/POST/Transaction/card/create"
+}
+
+# 2) POST /Transaction/card/activate -> card_activate
 resource "aws_api_gateway_resource" "CardActivate" {
   rest_api_id = aws_api_gateway_rest_api.CardApi.id
   parent_id   = aws_api_gateway_resource.CardResource.id
   path_part   = "activate"
 }
 
-# ==========================
-# Method POST /card/activate
-# ==========================
 resource "aws_api_gateway_method" "PostCardActivate" {
   rest_api_id   = aws_api_gateway_rest_api.CardApi.id
   resource_id   = aws_api_gateway_resource.CardActivate.id
@@ -100,44 +145,179 @@ resource "aws_api_gateway_method" "PostCardActivate" {
   authorization = "NONE"
 }
 
-# ==========================
-# Integration POST /card/activate -> Lambda
-# ==========================
 resource "aws_api_gateway_integration" "IntegrationPostCardActivate" {
   rest_api_id             = aws_api_gateway_rest_api.CardApi.id
   resource_id             = aws_api_gateway_resource.CardActivate.id
   http_method             = aws_api_gateway_method.PostCardActivate.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.dotnet_api.invoke_arn
+  uri                     = aws_lambda_function.lambdas["card_activate"].invoke_arn
 }
 
-# ==========================
-# Permisos Lambda -> API Gateway
-# ==========================
 resource "aws_lambda_permission" "ApiGatewayCardActivate" {
   statement_id  = "AllowExecutionFromAPIGatewayCardActivate"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.dotnet_api.function_name
+  function_name = aws_lambda_function.lambdas["card_activate"].function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.CardApi.execution_arn}/*/POST/Transaction/card/activate"
 }
 
+# 3) POST /Transaction/transactions/purchase -> card_purchase
+resource "aws_api_gateway_resource" "TransactionsPurchase" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.TransactionsResource.id
+  path_part   = "purchase"
+}
+
+resource "aws_api_gateway_method" "PostTransactionsPurchase" {
+  rest_api_id   = aws_api_gateway_rest_api.CardApi.id
+  resource_id   = aws_api_gateway_resource.TransactionsPurchase.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "IntegrationTransactionsPurchase" {
+  rest_api_id             = aws_api_gateway_rest_api.CardApi.id
+  resource_id             = aws_api_gateway_resource.TransactionsPurchase.id
+  http_method             = aws_api_gateway_method.PostTransactionsPurchase.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambdas["card_purchase"].invoke_arn
+}
+
+resource "aws_lambda_permission" "ApiGatewayTransactionsPurchase" {
+  statement_id  = "AllowExecutionFromAPIGatewayTransactionsPurchase"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambdas["card_purchase"].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.CardApi.execution_arn}/*/POST/Transaction/transactions/purchase"
+}
+
+# 4) POST /Transaction/transactions/save/{cardId} -> card_transaction_save
+resource "aws_api_gateway_resource" "TransactionsSave" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.TransactionsResource.id
+  path_part   = "save"
+}
+
+resource "aws_api_gateway_resource" "TransactionsSaveCardId" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.TransactionsSave.id
+  path_part   = "{cardId}"
+}
+
+resource "aws_api_gateway_method" "PostTransactionsSave" {
+  rest_api_id   = aws_api_gateway_rest_api.CardApi.id
+  resource_id   = aws_api_gateway_resource.TransactionsSaveCardId.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "IntegrationTransactionsSave" {
+  rest_api_id             = aws_api_gateway_rest_api.CardApi.id
+  resource_id             = aws_api_gateway_resource.TransactionsSaveCardId.id
+  http_method             = aws_api_gateway_method.PostTransactionsSave.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambdas["card_transaction_save"].invoke_arn
+}
+
+resource "aws_lambda_permission" "ApiGatewayTransactionsSave" {
+  statement_id  = "AllowExecutionFromAPIGatewayTransactionsSave"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambdas["card_transaction_save"].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.CardApi.execution_arn}/*/POST/Transaction/transactions/save/*"
+}
+
+# 5) POST /Transaction/card/paid/{cardId} -> card_paid_credit_card
+resource "aws_api_gateway_resource" "CardPaid" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.CardResource.id
+  path_part   = "paid"
+}
+
+resource "aws_api_gateway_resource" "CardPaidCardId" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.CardPaid.id
+  path_part   = "{cardId}"
+}
+
+resource "aws_api_gateway_method" "PostCardPaid" {
+  rest_api_id   = aws_api_gateway_rest_api.CardApi.id
+  resource_id   = aws_api_gateway_resource.CardPaidCardId.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "IntegrationCardPaid" {
+  rest_api_id             = aws_api_gateway_rest_api.CardApi.id
+  resource_id             = aws_api_gateway_resource.CardPaidCardId.id
+  http_method             = aws_api_gateway_method.PostCardPaid.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambdas["card_paid_credit_card"].invoke_arn
+}
+
+resource "aws_lambda_permission" "ApiGatewayCardPaid" {
+  statement_id  = "AllowExecutionFromAPIGatewayCardPaid"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambdas["card_paid_credit_card"].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.CardApi.execution_arn}/*/POST/Transaction/card/paid/*"
+}
+
+# 6) GET /Transaction/card/{cardId} -> card_get_report
+resource "aws_api_gateway_resource" "CardReport" {
+  rest_api_id = aws_api_gateway_rest_api.CardApi.id
+  parent_id   = aws_api_gateway_resource.CardResource.id
+  path_part   = "{cardId}"
+}
+
+resource "aws_api_gateway_method" "GetCardReport" {
+  rest_api_id   = aws_api_gateway_rest_api.CardApi.id
+  resource_id   = aws_api_gateway_resource.CardReport.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "IntegrationCardReport" {
+  rest_api_id             = aws_api_gateway_rest_api.CardApi.id
+  resource_id             = aws_api_gateway_resource.CardReport.id
+  http_method             = aws_api_gateway_method.GetCardReport.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambdas["card_get_report"].invoke_arn
+}
+
+resource "aws_lambda_permission" "ApiGatewayCardReport" {
+  statement_id  = "AllowExecutionFromAPIGatewayCardReport"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambdas["card_get_report"].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.CardApi.execution_arn}/*/GET/Transaction/card/*"
+}
+
+# 7) card-request-failed (no expuesto en API, ligado a SQS o DLQ)
+# (puedes engancharlo a un trigger SQS más adelante)
+# ====================================================
+
 # ==========================
-# Deployment
+# Deployment & Stage
 # ==========================
 resource "aws_api_gateway_deployment" "CardApiDeployment" {
   rest_api_id = aws_api_gateway_rest_api.CardApi.id
 
   depends_on = [
+    aws_api_gateway_integration.IntegrationPostCardCreate,
     aws_api_gateway_integration.IntegrationPostCardActivate,
-    aws_lambda_permission.ApiGatewayCardActivate
+    aws_api_gateway_integration.IntegrationTransactionsPurchase,
+    aws_api_gateway_integration.IntegrationTransactionsSave,
+    aws_api_gateway_integration.IntegrationCardPaid,
+    aws_api_gateway_integration.IntegrationCardReport
   ]
 }
 
-# ==========================
-# Stage (prod)
-# ==========================
 resource "aws_api_gateway_stage" "ProdStage" {
   deployment_id = aws_api_gateway_deployment.CardApiDeployment.id
   rest_api_id   = aws_api_gateway_rest_api.CardApi.id
@@ -145,11 +325,32 @@ resource "aws_api_gateway_stage" "ProdStage" {
 }
 
 # ==========================
-# Output URL
+# Output URLs
 # ==========================
+output "api_url_card_create" {
+  value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/card/create"
+}
+
 output "api_url_card_activate" {
   value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/card/activate"
 }
+
+output "api_url_card_purchase" {
+  value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/transactions/purchase"
+}
+
+output "api_url_card_save" {
+  value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/transactions/save/{cardId}"
+}
+
+output "api_url_card_paid" {
+  value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/card/paid/{cardId}"
+}
+
+output "api_url_card_report" {
+  value = "https://${aws_api_gateway_rest_api.CardApi.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.ProdStage.stage_name}/Transaction/card/{cardId}"
+}
+
 
 # ==========================
 # DynamoDB Cards Table
@@ -296,4 +497,3 @@ resource "aws_sqs_queue" "transaction_queue" {
     maxReceiveCount     = 5
   })
 }
-
