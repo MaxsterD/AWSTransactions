@@ -12,4 +12,10 @@
         public decimal Balance { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
+
+    public class CreateCardMessage
+    {
+        public string UserId { get; set; }
+        public string Request { get; set; } // "DEBIT" o "CREDIT"
+    }
 }

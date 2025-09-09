@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.S3;
 using AWSTransactionApi.Interfaces.Card;
 using AWSTransactionApi.Services.Card;
 
@@ -17,10 +18,17 @@ builder.Services.AddSingleton<IDynamoDBContext>(sp =>
     return new DynamoDBContext(client);
 });
 
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+builder.Services.AddSingleton<IAmazonDynamoDB>(sp => new AmazonDynamoDBClient(Amazon.RegionEndpoint.USWest2));
+builder.Services.AddSingleton<IDynamoDBContext>(sp => new DynamoDBContext(sp.GetRequiredService<IAmazonDynamoDB>()));
+builder.Services.AddSingleton<IAmazonS3>(sp => new AmazonS3Client(Amazon.RegionEndpoint.USWest2));
 
 builder.Services.AddScoped<ICardService, CardService>();
 

@@ -1,58 +1,83 @@
-﻿using AWSTransactionApi.Services.Card;
+﻿using AWSTransactionApi.Interfaces.Card;
+using AWSTransactionApi.Models;
+using AWSTransactionApi.Services.Card;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("[controller]")]
+[Route("Transaction")]
 public class CardController : ControllerBase
 {
-    private readonly CardService _service;
+    private readonly ICardService _svc;
+    public CardController(ICardService svc) { _svc = svc; }
 
-    public CardController(CardService service)
+    [HttpPost("card/activate")]
+    public async Task<IActionResult> Activate([FromBody] ActivateCardRequest req)
     {
-        _service = service;
+        try
+        {
+            var card = await _svc.ActivateCardAsync(req.userId);
+            return Ok(card);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpPost("activate")]
-    public IActionResult Activate([FromBody] dynamic request)
+    [HttpPost("transactions/purchase")]
+    public async Task<IActionResult> Purchase([FromBody] PurchaseRequest req)
     {
-        var userId = Guid.Parse((string)request.userId);
-        var card = _service.ActivateCard(userId);
-        return Ok(card);
+        try
+        {
+            var tx = await _svc.PurchaseAsync(req.cardId, req.merchant, req.amount);
+            return Ok(tx);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpPost("/transactions/purchase")]
-    public IActionResult Purchase([FromBody] dynamic request)
+    [HttpPost("transactions/save/{cardId}")]
+    public async Task<IActionResult> Save([FromRoute] string cardId, [FromBody] SaveBalanceRequest req)
     {
-        var cardId = Guid.Parse((string)request.cardId);
-        var merchant = (string)request.merchant;
-        var amount = (decimal)request.amount;
-
-        var tx = _service.Purchase(cardId, merchant, amount);
-        return Ok(tx);
+        try
+        {
+            var tx = await _svc.SaveTransactionAsync(cardId, req.merchant, req.amount);
+            return Ok(tx);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpPost("/transactions/save/{cardId}")]
-    public IActionResult SaveTransaction(Guid cardId, [FromBody] dynamic request)
+
+    [HttpPost("card/paid/{cardId}")]
+    public async Task<IActionResult> Pay([FromRoute] string cardId, [FromBody] PayCreditRequest req)
     {
-        var merchant = (string)request.merchant;
-        var amount = (decimal)request.amount;
-        var tx = _service.SaveTransaction(cardId, merchant, amount);
-        return Ok(tx);
+        try
+        {
+            var tx = await _svc.PayCreditCardAsync(cardId, req.merchant, req.amount);
+            return Ok(tx);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpPost("/card/paid/{cardId}")]
-    public IActionResult PayCreditCard(Guid cardId, [FromBody] dynamic request)
+    [HttpGet("card/{cardId}")]
+    public async Task<IActionResult> GetReport([FromRoute] string cardId, [FromQuery] string start, [FromQuery] string end)
     {
-        var merchant = (string)request.merchant;
-        var amount = (decimal)request.amount;
-        var tx = _service.PayCreditCard(cardId, merchant, amount);
-        return Ok(tx);
-    }
-
-    [HttpGet("/card/{cardId}")]
-    public IActionResult GetReport(Guid cardId, [FromQuery] DateTime start, [FromQuery] DateTime end)
-    {
-        var txs = _service.GetTransactions(cardId, start, end);
-        return Ok(txs);
+        try
+        {
+            var (key, bucket) = await _svc.GenerateReportAsync(cardId, start, end);
+            return Ok(new { s3Key = key, bucket });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

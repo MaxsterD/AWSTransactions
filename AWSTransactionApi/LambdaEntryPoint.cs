@@ -7,7 +7,7 @@ namespace AWSTransactionApi
     {
         protected override void Init(IWebHostBuilder builder)
         {
-            // Ojo: aquí va directo UseStartup
+            
             builder.UseStartup<ProgramStartup>();
         }
     }
@@ -16,7 +16,7 @@ namespace AWSTransactionApi
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            // Aquí puedes replicar los servicios de Program.cs
+            
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
