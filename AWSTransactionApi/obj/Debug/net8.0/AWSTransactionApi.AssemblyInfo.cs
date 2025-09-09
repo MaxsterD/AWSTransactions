@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AWSTransactionApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d5ea3074ac6d6e604bfa7891503a1a12867427aa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+87267c36e1b116494ff517717761ae537bd58826")]
 [assembly: System.Reflection.AssemblyProductAttribute("AWSTransactionApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AWSTransactionApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

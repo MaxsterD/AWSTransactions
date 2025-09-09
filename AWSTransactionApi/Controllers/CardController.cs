@@ -10,6 +10,20 @@ public class CardController : ControllerBase
     private readonly ICardService _svc;
     public CardController(ICardService svc) { _svc = svc; }
 
+    [HttpPost("card/create")]
+    public async Task<IActionResult> Create([FromBody] CreateCardMessage req)
+    {
+        try
+        {
+            var card = await _svc.CreateCardAsync(req.UserId,req.Request);
+            return Ok(card);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     [HttpPost("card/activate")]
     public async Task<IActionResult> Activate([FromBody] ActivateCardRequest req)
     {
