@@ -12,6 +12,10 @@ C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Amazon.Lambda.Core.dll
 C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Amazon.Lambda.Logging.AspNetCore.dll
 C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Amazon.Lambda.RuntimeSupport.dll
 C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Amazon.Lambda.Serialization.SystemTextJson.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Amazon.Lambda.SQSEvents.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSSDK.Core.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSSDK.DynamoDBv2.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\AWSSDK.S3.dll
 C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Microsoft.OpenApi.dll
 C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\SnapshotRestore.Registry.dll
 C:\Users\USUARIO\source\repos\AWSTransactionApi\publish\Swashbuckle.AspNetCore.Swagger.dll

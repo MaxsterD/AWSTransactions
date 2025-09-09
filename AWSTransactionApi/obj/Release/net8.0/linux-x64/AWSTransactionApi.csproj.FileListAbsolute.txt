@@ -41,3 +41,7 @@ C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\obj\Release\ne
 C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\obj\Release\net8.0\linux-x64\AWSTransactionApi.pdb
 C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\obj\Release\net8.0\linux-x64\AWSTransactionApi.genruntimeconfig.cache
 C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\obj\Release\net8.0\linux-x64\ref\AWSTransactionApi.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\bin\Release\net8.0\linux-x64\Amazon.Lambda.SQSEvents.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\bin\Release\net8.0\linux-x64\AWSSDK.Core.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\bin\Release\net8.0\linux-x64\AWSSDK.DynamoDBv2.dll
+C:\Users\USUARIO\source\repos\AWSTransactionApi\AWSTransactionApi\bin\Release\net8.0\linux-x64\AWSSDK.S3.dll
