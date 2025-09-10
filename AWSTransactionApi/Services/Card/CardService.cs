@@ -16,8 +16,6 @@ namespace AWSTransactionApi.Services.Card
     {
         private readonly IDynamoDBContext _dbContext;
         private readonly INotificationService _notificationService;
-        private readonly List<CardModel> _cards = new();
-        private readonly List<TransactionModel> _transactions = new();
         private readonly IAmazonS3 _s3;
         private readonly string _reportsBucket;
 
@@ -120,8 +118,12 @@ namespace AWSTransactionApi.Services.Card
         public async Task<CardDynamo> ActivateCardAsync(string userId)
         {
             // Query cards by userId - DynamoDBContext.QueryAsync expects key value; we didn't set GSI so we scan
-            var cards = await _dbContext.ScanAsync<CardDynamo>(new List<ScanCondition> { new ScanCondition("userId", ScanOperator.Equal, userId) }).GetRemainingAsync();
-            var card = cards.FirstOrDefault();
+            var cards = await _dbContext.ScanAsync<CardDynamo>(
+                new List<ScanCondition>
+                {
+                new ScanCondition("userId", ScanOperator.Equal, userId),
+                new ScanCondition("type", ScanOperator.Equal, "CREDIT") // filtramos solo tarjetas de crédito
+                        }).GetRemainingAsync(); var card = cards.FirstOrDefault();
             if (card == null) throw new Exception("Card not found for user");
 
             // Count PURCHASE transactions for that cardId
@@ -173,12 +175,20 @@ namespace AWSTransactionApi.Services.Card
                 {
                     if (card.balance < amount) throw new Exception("Credit limit exceeded");
                     card.balance += amount;
-                    await ActivateCardAsync(card.userId);
+                    
                 }
 
                 await _dbContext.SaveAsync(card);
 
-                var tx = new TransactionDynamo
+                //var txs = await _dbContext.ScanAsync<TransactionDynamo>(new List<ScanCondition> { new ScanCondition("cardId", ScanOperator.Equal, card.uuid) }).GetRemainingAsync();
+                //var purchaseCount = txs.Count(t => t.type == "PURCHASE");
+
+                //if (purchaseCount >= 10)
+                //{
+                //    await ActivateCardAsync(card.userId);
+                //}
+
+                    var tx = new TransactionDynamo
                 {
                     uuid = Guid.NewGuid().ToString(),
                     cardId = card.uuid,

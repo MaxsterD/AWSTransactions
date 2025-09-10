@@ -10,6 +10,7 @@
         "dependencies": {
           "AWSSDK.DynamoDBv2": "4.0.6.1",
           "AWSSDK.S3": "4.0.7",
+          "AWSSDK.SQS": "4.0.1.2",
           "Amazon.Lambda.AspNetCoreServer": "9.2.0",
           "Amazon.Lambda.RuntimeSupport": "1.13.2",
           "Amazon.Lambda.SQSEvents": "2.2.0",
@@ -131,6 +132,17 @@
           "lib/net8.0/AWSSDK.S3.dll": {
             "assemblyVersion": "4.0.0.0",
             "fileVersion": "4.0.7.0"
+          }
+        }
+      },
+      "AWSSDK.SQS/4.0.1.2": {
+        "dependencies": {
+          "AWSSDK.Core": "4.0.0.26"
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.SQS.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.0.1.2"
           }
         }
       },
@@ -312,6 +324,13 @@
       "sha512": "sha512-5+DpOmodS7IBxWamMxv2VaK+kkTHv/rQPakop0b33ymd/zX9XQU/39sRJdaxYgJ2igMmVEE74+i5PXy3JowcgA==",
       "path": "awssdk.s3/4.0.7",
       "hashPath": "awssdk.s3.4.0.7.nupkg.sha512"
+    },
+    "AWSSDK.SQS/4.0.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZFOpkYgCebCtlUnaxeSUgpkD2Khl1TN73Vmpw57WeRo3kEDKIbEyNR8jotSBd3rKc2jdnl/3GANXVNK6KGc1nA==",
+      "path": "awssdk.sqs/4.0.1.2",
+      "hashPath": "awssdk.sqs.4.0.1.2.nupkg.sha512"
     },
     "Microsoft.Extensions.ApiDescription.Server/6.0.5": {
       "type": "package",

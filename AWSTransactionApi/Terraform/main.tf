@@ -49,6 +49,10 @@ locals {
     card_get_report       = "card-get-report-lambda"
     card_request_failed   = "card-request-failed"
   }
+
+  lambda_sqs_config = {
+    create_card_sqs = "create-request-card-sqs-lambda"
+  }
 }
 
 resource "aws_lambda_function" "lambdas" {
@@ -543,6 +547,20 @@ resource "aws_iam_policy" "transaction_bucket_policy" {
   })
 }
 
+# Lambda SQS
+resource "aws_lambda_function" "lambdas_sqs" {
+  for_each      = local.lambda_sqs_config
+  function_name = each.value
+  filename      = "${path.module}/../../publish/app.zip"
+  handler       = "AWSTransactionApi::AWSTransactionApi.CreateRequestCardLambda::Handler"
+  runtime       = "dotnet8"
+  role          = aws_iam_role.iam_for_lambda.arn
+  memory_size   = 512
+  timeout       = 900
+  publish       = true
+  source_code_hash = filebase64sha256("${path.module}/../../publish/app.zip")
+}
+
 # ==========================
 # Dead Letter Queue (DLQ)
 # ==========================
@@ -582,7 +600,8 @@ resource "aws_iam_policy" "lambda_sqs_policy" {
         Action = [
           "sqs:ReceiveMessage",
           "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
+          "sqs:GetQueueAttributes",
+          "sqs:SendMessage"
         ]
         Resource = aws_sqs_queue.transaction_queue.arn
       },
@@ -607,12 +626,15 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
   policy_arn = aws_iam_policy.transaction_bucket_policy.arn
 }
 
+
+
+
 # ==========================
 # Lambda Event Source Mapping (SQS -> Lambda)
 # ==========================
 resource "aws_lambda_event_source_mapping" "create_card_sqs_trigger" {
   event_source_arn  = aws_sqs_queue.transaction_queue.arn
-  function_name     = aws_lambda_function.lambdas["create_request_card"].arn
+  function_name     = aws_lambda_function.lambdas_sqs["create_card_sqs"].arn
   batch_size        = 1
   enabled           = true
 }
