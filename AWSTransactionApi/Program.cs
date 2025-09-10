@@ -38,7 +38,7 @@ builder.Services.AddSingleton<IDynamoDBContext>(sp => new DynamoDBContext(sp.Get
 builder.Services.AddSingleton<IAmazonS3>(sp => new AmazonS3Client(Amazon.RegionEndpoint.USWest2));
 
 builder.Services.AddScoped<ICardService, CardService>();
-builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 

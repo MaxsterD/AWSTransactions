@@ -315,6 +315,10 @@ resource "aws_api_gateway_deployment" "CardApiDeployment" {
     create_before_destroy = true
   }
 
+  triggers = {
+    redeploy = timestamp()
+  }
+
   depends_on = [
     aws_api_gateway_integration.IntegrationPostCardCreate,
     aws_api_gateway_integration.IntegrationPostCardActivate,

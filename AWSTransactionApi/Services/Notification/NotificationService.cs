@@ -28,6 +28,8 @@ namespace AWSTransactionApi.Services.Notification
             var body = new
             {
                 type = type,
+                userId = data.GetType().GetProperty("userId")?.GetValue(data, null),
+                userEmail  = data.GetType().GetProperty("userEmail")?.GetValue(data, null),
                 data = data
             };
 

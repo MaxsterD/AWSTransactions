@@ -11,5 +11,8 @@ namespace AWSTransactionApi.Models.DynamoModels
 
         [DynamoDBRangeKey]
         public string document { get; set; }
+
+        [DynamoDBProperty]
+        public string email { get; set; }
     }
 }

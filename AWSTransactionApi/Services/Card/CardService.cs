@@ -99,11 +99,19 @@ namespace AWSTransactionApi.Services.Card
 
             await _dbContext.SaveAsync(card);
 
+            var users = await _dbContext.ScanAsync<UserDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, card.userId) }
+                ).GetRemainingAsync();
+
+            var user = users.FirstOrDefault();
+
             await _notificationService.SendNotificationAsync("CARD.CREATE", new
             {
                 date = DateTime.UtcNow,
                 type = card.type,
-                amount = card.balance
+                amount = card.balance,
+                userId = user.uuid,
+                userEmail = user.email
             });
 
             return card;
@@ -125,11 +133,19 @@ namespace AWSTransactionApi.Services.Card
                 card.status = "ACTIVATED";
                 await _dbContext.SaveAsync(card);
 
+                var users = await _dbContext.ScanAsync<UserDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, card.userId) }
+                ).GetRemainingAsync();
+
+                var user = users.FirstOrDefault();
+
                 await _notificationService.SendNotificationAsync("CARD.ACTIVATE", new
                 {
                     date = DateTime.UtcNow,
                     type = card.type,
-                    amount = card.balance
+                    amount = card.balance,
+                    userId = user.uuid,
+                    userEmail = user.email
                 });
 
                 return card;
@@ -155,10 +171,9 @@ namespace AWSTransactionApi.Services.Card
                 }
                 else // CREDIT
                 {
-                    // For credit we assume 'balance' stores used balance. Need a limit — let's assume 5000 for now
-                    decimal limit = 5000m;
-                    if ((card.balance + amount) > limit) throw new Exception("Credit limit exceeded");
-                    card.balance += amount; // increase debt/used
+                    if (card.balance < amount) throw new Exception("Credit limit exceeded");
+                    card.balance += amount;
+                    await ActivateCardAsync(card.userId);
                 }
 
                 await _dbContext.SaveAsync(card);
@@ -175,12 +190,20 @@ namespace AWSTransactionApi.Services.Card
 
                 await _dbContext.SaveAsync(tx);
 
+                var users = await _dbContext.ScanAsync<UserDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, card.userId) }
+                ).GetRemainingAsync();
+
+                var user = users.FirstOrDefault();
+
                 await _notificationService.SendNotificationAsync("TRANSACTION.PURCHASE", new
                 {
                     date = DateTime.UtcNow,
                     merchant = merchant,
                     cardId = card.uuid,
-                    amount = amount
+                    amount = amount,
+                    userId = user.uuid,
+                    userEmail = user.email
                 });
 
                 return tx;
@@ -220,11 +243,19 @@ namespace AWSTransactionApi.Services.Card
 
                 await _dbContext.SaveAsync(tx);
 
+                var users = await _dbContext.ScanAsync<UserDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, card.userId) }
+                ).GetRemainingAsync();
+
+                var user = users.FirstOrDefault();
+
                 await _notificationService.SendNotificationAsync("TRANSACTION.SAVE", new
                 {
                     date = DateTime.UtcNow,
                     merchant = "SAVING",
-                    amount = amount
+                    amount = amount,
+                    userId = user.uuid,
+                    userEmail = user.email
                 });
 
                 return tx;
@@ -266,11 +297,21 @@ namespace AWSTransactionApi.Services.Card
 
                 await _dbContext.SaveAsync(tx);
 
+                
+
+                var users = await _dbContext.ScanAsync<UserDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, card.userId) }
+                ).GetRemainingAsync();
+
+                var user = users.FirstOrDefault();
+
                 await _notificationService.SendNotificationAsync("TRANSACTION.PAID", new
                 {
                     date = DateTime.UtcNow,
                     merchant = merchant,
-                    amount = amount
+                    amount = amount,
+                    userId = user.uuid,
+                    userEmail = user.email
                 });
 
                 return tx;
@@ -324,10 +365,24 @@ namespace AWSTransactionApi.Services.Card
 
                 var fileUrl = $"https://{_reportsBucket}.s3.us-east-2.amazonaws.com/{key}";
 
+                var cards = await _dbContext.ScanAsync<CardDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, cardId) }
+                ).GetRemainingAsync();
+
+                var card = cards.FirstOrDefault();
+
+                var users = await _dbContext.ScanAsync<UserDynamo>(
+                    new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, card.userId) }
+                ).GetRemainingAsync();
+
+                var user = users.FirstOrDefault();
+
                 await _notificationService.SendNotificationAsync("REPORT.ACTIVITY", new
                 {
                     date = DateTime.UtcNow,
-                    url = fileUrl
+                    url = fileUrl,
+                    userId = user.uuid,
+                    userEmail = user.email
                 });
 
                 return (key, _reportsBucket);
