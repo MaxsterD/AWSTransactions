@@ -92,3 +92,4 @@ C:\Users\Usuario\source\repos\AWSTransactions\AWSTransactionApi\obj\Release\net8
 C:\Users\Usuario\source\repos\AWSTransactions\AWSTransactionApi\obj\Release\net8.0\linux-x64\AWSTransactionApi.pdb
 C:\Users\Usuario\source\repos\AWSTransactions\AWSTransactionApi\obj\Release\net8.0\linux-x64\AWSTransactionApi.genruntimeconfig.cache
 C:\Users\Usuario\source\repos\AWSTransactions\AWSTransactionApi\obj\Release\net8.0\linux-x64\ref\AWSTransactionApi.dll
+C:\Users\Usuario\source\repos\AWSTransactions\AWSTransactionApi\bin\Release\net8.0\linux-x64\AWSSDK.SQS.dll

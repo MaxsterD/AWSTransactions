@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "A30b6+h7W7E=",
+  "dgSpecHash": "HyPFAChj6Q8=",
   "success": true,
   "projectFilePath": "C:\\Users\\Usuario\\source\\repos\\AWSTransactions\\AWSTransactionApi\\AWSTransactionApi.csproj",
   "expectedPackageFiles": [
@@ -15,6 +15,7 @@
     "C:\\Users\\Usuario\\.nuget\\packages\\awssdk.core\\4.0.0.26\\awssdk.core.4.0.0.26.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\awssdk.dynamodbv2\\4.0.6.1\\awssdk.dynamodbv2.4.0.6.1.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\awssdk.s3\\4.0.7\\awssdk.s3.4.0.7.nupkg.sha512",
+    "C:\\Users\\Usuario\\.nuget\\packages\\awssdk.sqs\\4.0.1.2\\awssdk.sqs.4.0.1.2.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.configuration\\2.1.0\\microsoft.extensions.configuration.2.1.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\2.1.0\\microsoft.extensions.configuration.abstractions.2.1.0.nupkg.sha512",

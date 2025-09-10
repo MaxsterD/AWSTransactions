@@ -1,8 +1,11 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.S3;
+using Amazon.SQS;
 using AWSTransactionApi.Interfaces.Card;
+using AWSTransactionApi.Interfaces.Notification;
 using AWSTransactionApi.Services.Card;
+using AWSTransactionApi.Services.Notification;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,10 @@ builder.Services.AddSingleton<IDynamoDBContext>(sp =>
     return new DynamoDBContext(client);
 });
 
+builder.Services.AddSingleton<IAmazonSQS>(sp =>
+{
+    return new AmazonSQSClient(Amazon.RegionEndpoint.USEast2);
+});
 
 
 builder.Services.AddControllers();
@@ -31,6 +38,8 @@ builder.Services.AddSingleton<IDynamoDBContext>(sp => new DynamoDBContext(sp.Get
 builder.Services.AddSingleton<IAmazonS3>(sp => new AmazonS3Client(Amazon.RegionEndpoint.USWest2));
 
 builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
+
 
 
 var app = builder.Build();
@@ -40,14 +49,20 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
+    });
 }
 else {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
+    });
 }
 
-    app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

@@ -15,7 +15,9 @@ public class CardController : ControllerBase
     {
         try
         {
-            var card = await _svc.CreateCardAsync(req.UserId,req.Request);
+            var requestType = string.IsNullOrWhiteSpace(req.Request) ? "DEBIT" : req.Request.ToUpper();
+
+            var card = await _svc.CreateCardAsync(req.UserId, requestType);
             return Ok(card);
         }
         catch (Exception ex)

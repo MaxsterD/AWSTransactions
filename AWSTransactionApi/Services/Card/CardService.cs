@@ -3,6 +3,7 @@ using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.S3;
 using Amazon.S3.Transfer;
 using AWSTransactionApi.Interfaces.Card;
+using AWSTransactionApi.Interfaces.Notification;
 using AWSTransactionApi.Models;
 using AWSTransactionApi.Models.DynamoModels;
 using System.Globalization;
@@ -14,16 +15,18 @@ namespace AWSTransactionApi.Services.Card
     public class CardService : ICardService
     {
         private readonly IDynamoDBContext _dbContext;
+        private readonly INotificationService _notificationService;
         private readonly List<CardModel> _cards = new();
         private readonly List<TransactionModel> _transactions = new();
         private readonly IAmazonS3 _s3;
         private readonly string _reportsBucket;
 
-        public CardService(IDynamoDBContext db, IAmazonS3 s3, IConfiguration cfg)
+        public CardService(IDynamoDBContext db, IAmazonS3 s3, IConfiguration cfg, INotificationService notificationService)
         {
             _dbContext = db;
             _s3 = s3;
             _reportsBucket = cfg["ReportsBucket"] ?? throw new ArgumentNullException("ReportsBucket");
+            _notificationService = notificationService;
         }
 
         private async Task LogErrorAsync(string cardId, Exception ex, string rawMessage = null)
@@ -40,6 +43,9 @@ namespace AWSTransactionApi.Services.Card
 
         public async Task<CardDynamo> CreateCardAsync(string userId, string requestType)
         {
+            requestType = string.IsNullOrWhiteSpace(requestType) ? "DEBIT" : requestType.ToUpper();
+
+
             var userScan = await _dbContext.ScanAsync<UserDynamo>(
                 new List<ScanCondition> { new ScanCondition("uuid", ScanOperator.Equal, userId) }
             ).GetRemainingAsync();
@@ -93,6 +99,13 @@ namespace AWSTransactionApi.Services.Card
 
             await _dbContext.SaveAsync(card);
 
+            await _notificationService.SendNotificationAsync("CARD.CREATE", new
+            {
+                date = DateTime.UtcNow,
+                type = card.type,
+                amount = card.balance
+            });
+
             return card;
         }
 
@@ -111,6 +124,14 @@ namespace AWSTransactionApi.Services.Card
             {
                 card.status = "ACTIVATED";
                 await _dbContext.SaveAsync(card);
+
+                await _notificationService.SendNotificationAsync("CARD.ACTIVATE", new
+                {
+                    date = DateTime.UtcNow,
+                    type = card.type,
+                    amount = card.balance
+                });
+
                 return card;
             }
 
@@ -153,6 +174,15 @@ namespace AWSTransactionApi.Services.Card
                 };
 
                 await _dbContext.SaveAsync(tx);
+
+                await _notificationService.SendNotificationAsync("TRANSACTION.PURCHASE", new
+                {
+                    date = DateTime.UtcNow,
+                    merchant = merchant,
+                    cardId = card.uuid,
+                    amount = amount
+                });
+
                 return tx;
             }
             catch (Exception ex)
@@ -189,6 +219,14 @@ namespace AWSTransactionApi.Services.Card
                 };
 
                 await _dbContext.SaveAsync(tx);
+
+                await _notificationService.SendNotificationAsync("TRANSACTION.SAVE", new
+                {
+                    date = DateTime.UtcNow,
+                    merchant = "SAVING",
+                    amount = amount
+                });
+
                 return tx;
             }
             catch (Exception ex)
@@ -227,6 +265,14 @@ namespace AWSTransactionApi.Services.Card
                 };
 
                 await _dbContext.SaveAsync(tx);
+
+                await _notificationService.SendNotificationAsync("TRANSACTION.PAID", new
+                {
+                    date = DateTime.UtcNow,
+                    merchant = merchant,
+                    amount = amount
+                });
+
                 return tx;
             }
             catch (Exception ex)
@@ -275,6 +321,14 @@ namespace AWSTransactionApi.Services.Card
                     var tu = new TransferUtility(_s3);
                     await tu.UploadAsync(uploadRequest);
                 }
+
+                var fileUrl = $"https://{_reportsBucket}.s3.us-east-2.amazonaws.com/{key}";
+
+                await _notificationService.SendNotificationAsync("REPORT.ACTIVITY", new
+                {
+                    date = DateTime.UtcNow,
+                    url = fileUrl
+                });
 
                 return (key, _reportsBucket);
             }

@@ -17,7 +17,8 @@ namespace AWSTransactionApi.Lambdas
             var client = new Amazon.DynamoDBv2.AmazonDynamoDBClient();
             var ctx = new Amazon.DynamoDBv2.DataModel.DynamoDBContext(client);
             var s3 = new Amazon.S3.AmazonS3Client();
-            _svc = new CardService(ctx, s3, new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> { { "ReportsBucket", Environment.GetEnvironmentVariable("ReportsBucket") ?? "" } }).Build());
+            var notification = new Services.Notification.NotificationService(new Amazon.SQS.AmazonSQSClient(), new Microsoft.Extensions.Configuration.ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> { { "NotificationQueueUrl", Environment.GetEnvironmentVariable("NotificationQueueUrl") ?? "" } }).Build());
+            _svc = new CardService(ctx, s3, new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> { { "ReportsBucket", Environment.GetEnvironmentVariable("ReportsBucket") ?? "" } }).Build(), notification);
         }
 
         public async Task Handler(SQSEvent evnt, ILambdaContext context)

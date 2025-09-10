@@ -35,6 +35,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+
 # -------------------
 # Lambda Functions
 # -------------------
@@ -310,6 +311,10 @@ resource "aws_lambda_permission" "ApiGatewayCardReport" {
 resource "aws_api_gateway_deployment" "CardApiDeployment" {
   rest_api_id = aws_api_gateway_rest_api.CardApi.id
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   depends_on = [
     aws_api_gateway_integration.IntegrationPostCardCreate,
     aws_api_gateway_integration.IntegrationPostCardActivate,
@@ -544,7 +549,7 @@ resource "aws_sqs_queue" "transaction_dlq" {
 }
 
 # ==========================
-# SQS Queue
+# SQS Queue principal
 # ==========================
 resource "aws_sqs_queue" "transaction_queue" {
   name                        = var.sqs_name
@@ -557,4 +562,53 @@ resource "aws_sqs_queue" "transaction_queue" {
     deadLetterTargetArn = aws_sqs_queue.transaction_dlq.arn
     maxReceiveCount     = 5
   })
+}
+
+# ==========================
+# Lambda Policy for SQS
+# ==========================
+
+resource "aws_iam_policy" "lambda_sqs_policy" {
+  name = "LambdaSQSPolicy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Resource = aws_sqs_queue.transaction_queue.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = "arn:aws:sqs:us-east-2:346225465782:notification-email-sqs"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_sqs_attach" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.lambda_sqs_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.transaction_bucket_policy.arn
+}
+
+# ==========================
+# Lambda Event Source Mapping (SQS -> Lambda)
+# ==========================
+resource "aws_lambda_event_source_mapping" "create_card_sqs_trigger" {
+  event_source_arn  = aws_sqs_queue.transaction_queue.arn
+  function_name     = aws_lambda_function.lambdas["create_request_card"].arn
+  batch_size        = 1
+  enabled           = true
 }

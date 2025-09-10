@@ -31,11 +31,11 @@ variable "bucket_name" {
 variable "sqs_name" {
   description = "name of sqs"
   type        = string
-  default     = "transaction-queue"
+  default     = "create-request-card-sqs"
 }
 
 variable "dlq_name" {
   description = "name of dlq"
   type        = string
-  default     = "transaction-dead-letter-queue"
+  default     = "create-request-card-dlq"
 }

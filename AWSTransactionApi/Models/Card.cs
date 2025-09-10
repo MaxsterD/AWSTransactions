@@ -15,7 +15,7 @@
 
     public class CreateCardMessage
     {
-        public string UserId { get; set; }
+        public required string UserId { get; set; }
         public string Request { get; set; } // "DEBIT" o "CREDIT"
     }
 }
